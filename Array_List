@@ -1,1 +1,21 @@
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
+public class IntArrayConvertToList {
+  public static void main(String[] args) {
+        // int 배열
+        int[] arr = { 1, 2, 3 };
+
+        // int -> List
+        List<Integer> intList = Arrays.stream(arr).boxed().collect(Collectors.toList());
+
+        // List 출력
+        System.out.println(intList.size()); // 3
+        System.out.println(intList); // [1, 2, 3]
+    }
+}
+
+JAVA 8 이후부터는 Stream을 사용할 수 있습니다.
+여기서 boxed() 메소드는 Primitive Stream 값들을 Wrapper Class로 바꿔줍니다.
+그후, collect(Collectors.toList())를 이용하여, 주어진 stream을 List로 변경해 줄 수 있습니다.
