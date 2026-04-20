@@ -1,0 +1,161 @@
+/*
+
+장점
+유일한 인스턴스 : 싱글톤 패턴이 적용된 클래스의 인스턴스는 애플리케이션 전역에서 단 하나만 존재하도록 보장한다. 이는 객체의 일관된 상태를 유지하고 전역에서 접근 가능하도록 한다.
+메모리 절약 : 인스턴스가 단 하나뿐이므로 메모리를 절약할 수 있다. 생성자를 여러 번 호출하더라도 새로운 인스턴스를 생성하지 않아 메모리 점유 및 해제에 대한 오버헤드를 줄인다.
+지연 초기화 : 인스턴스가 실제로 사용되는 시점에 생성하여 초기 비용을 줄일 수 있다.
+
+
+단점
+결합도 증가 : 싱글톤 패턴은 전역에서 접근을 허용하기 때문에 해당 인스턴스에 의존하는 경우 결합도가 증가할 수 있다.
+테스트 복잡성 : 싱글톤 패턴은 단 하나의 인스턴스만을 생성하고 자원을 공유하기 때문에 싱글톤 클래스를 의존하는 클래스는 결합도 증가로 인해 테스트가 어려울 수 있다.
+상태 관리의 어려움 : 만약, 싱글톤 클래스가 상태를 가지고 있는 경우 전역에서 사용되어 변경될 수 있다. 이로 인해 예상치 못한 동작이 발생할 수 있다.
+전역에서 접근 가능 : 애플리케이션 내 어디서든 접근이 가능한 경우, 무분별한 사용을 막기 힘들다. 이로 인해 변경에 대한 복잡성이 증가할 수 있다.
+
+
+싱글톤 패턴의 기본 구현
+싱글톤 패턴을 적용할 경우 두 개 이상의 객체는 존재할 수 없다. 이를 구현하기 위해서는 객체 생성을 위한 new 생성자에 제약을 걸어야 하고, 만들어진 단일 객체를 반환할 수 있는 메서드가 필요하다. 따라서 다음 세 가지 조건이 반드시 충족되어야 한다.
+new 키워드를 사용할 수 없도록 생성자에 private 접근 제어자를 지정해야 한다.
+유일한 단일 객체를 반환할 수 있는 정적 메서드가 필요하다.
+유일한 단일 객체를 참조할 정적 참조 변수가 필요하다.
+
+
+주의사항
+멀티 스레드 환경에서 Thread Safe하지 않는 문제점이 있다. Thread Safe는 여러 스레드가 동시에 접근하는 경우 해당 애플리케이션에 어떠한 문제도 발생하지 않는 것을 의미한다. 즉, 싱글톤 패턴은 여러 스레드가 동시에 접근하는 경우 문제가 발생한다는 것을 의미한다.
+
+정리
+싱글톤 패턴은 객체의 인스턴스가 단 하나만을 생성하도록 만드는 디자인 패턴이다.
+private 생성자를 가져야 하는 특징이 있다.
+단일 객체 참조 변수는 static 이어야 하고 getInstance() 메서드를 참조한다.
+변경 여지가 있는 상태 값을 가지지 않는 것이 좋다.
+멀티 스레드 환경의 경우 Thread Safe한 구현 방법을 고려해야 한다.
+Thread Safe한 싱글톤 패턴은 Bill Pugh Solution 방법과 Enum 사용을 권장하고 있다.
+*/
+
+public class Singleton {
+    // 정적 참조 변수(싱글톤 객체를 담을 변수)
+    private static Singleton singletonObject;
+
+    // private 생성자
+    private Singleton() {
+    }
+    
+    // getInstance()
+    public static Singleton getInstance() {
+        if (singletonObject == null) {
+            singletonObject = new Singleton();
+        }
+        
+        return singletonObject;
+    }
+}
+
+/*
+singletonObject는 단일 객체를 저장하기 위한 정적 참조 변수다.
+외부에서는 해당 객체를 생성할 수 없도록 생성자를 private로 지정한다.
+getInstance() 메서드를 통해 인스턴스를 얻을 수 있다.
+getInstance()를 최초로 실행할 때에만 초기화한다. (지연 초기화)
+*/
+
+
+//////  sychronized 키워드 사용  //////
+
+public class Singleton {
+    private static Singleton singletonObject;
+
+    private Singleton() {
+    }
+    
+    public static synchronized Singleton getInstance() {
+        if (singletonObject == null) {
+            singletonObject = new Singleton();
+        }
+        
+        return singletonObject;
+    }
+}
+// 단, 여러 스레드가 getInstance() 메서드를 동시에 접근하려 할 때 동기화 작업(Lock) 때문에 성능 저하가 발생할 수 있다.
+
+
+//////  이른 초기화(eager initialization) 사용  //////
+
+public class Singleton {
+    private static final Singleton SINGLETON_OBJECT = new Singleton();
+
+    private Singleton() {
+    }
+
+    public static synchronized Singleton getInstance() {
+        return SINGLETON_OBJECT;
+    }
+}
+
+/*
+변수 선언과 동시에 초기화하여 Thread Safe한 싱글톤 패턴을 구현할 수 있다.
+부가적으로 final 키워드를 붙여 상수로써 사용하면 전역에서 공유하면서 변하지 않는 속성으로 사용한다.
+다만, 미리 생성하는 것 자체가 단점으로 작용할 수 있다.
+애플리케이션 실행과 동시에 Singleton 객체가 인스턴스화하여 메모리를 점유하게 된다.
+만약, 해당 리소스를 사용하지 않는다면 자원 낭비일 뿐이다.
+*/
+
+//////  Double checked locking 사용  //////
+
+public class Singleton {
+    // volatile 키워드 사용
+    private static volatile Singleton singletonObject;
+
+    private Singleton() {
+    }
+
+    public static Singleton getInstance() {
+        if (singletonObject == null) {
+            // if 문 진입 시에만 Singleton 클래스에 대한 동기화 작업 수행
+            synchronized (Singleton.class) {
+                if (singletonObject == null) {
+                    singletonObject = new Singleton();
+                }
+            }
+        }
+
+        return singletonObject;
+    }
+}
+/*
+이 방법은 최초 getInstance() 메서드를 호출할 때 두 스레드가 if 문에 진입하더라도, 이후에 진행되는 synchronized 키워드로 인해 두 번째 if 문에서는 lock이 걸려 Thread Safe한 싱글톤 패턴의 구현 방법이다.
+매번 getInstance() 메서드를 호출할 때마다 동기화 작업이 걸리는 것이 아닌 최초에 초기화할 때에만 동기화 작업을 수행한다.
+다만, 이 방법은 volatile 키워드를 사용하기 위해 JVM 버전이 1.5 이상이어야만 한다.
+따라서 JVM에 따라 Thread Safe하지 않을 수 있는 문제점이 있다.
+*/
+
+//////  Bill Pugh Solution 사용 (권장)  //////
+
+public class Singleton {
+
+    private Singleton() {
+    }
+
+    private static class SingletonHolder {
+        private static final Singleton SINGLETON_OBJECT = new Singleton();
+    }
+
+    public static Singleton getInstance() {
+        return SingletonHolder.SINGLETON_OBJECT;
+    }
+}
+
+/*
+Double checked locking보다 단순하면서 JVM 버전에 제약 없이 지연 초기화와 Thread Safe한 싱글톤 패턴을 구현할 수 있다.
+싱글톤 패턴 구현의 권장되는 방법이지만, 이 방법 또한 문제점이 없지 않다.
+자바 리플렉션과 직렬화를 통해 싱글톤이 파괴될 수 있다.
+*/
+
+//////  Enum 사용 (권장)  //////
+public enum Singleton {
+    SINGLETON_OBJECT
+}
+
+/*
+지금까지의 노력이 헛수고처럼 느껴질 수 있게 만드는 코드다.
+단순한 코드로 싱글톤 패턴을 구현할 수 있다.
+다만, Enum 외의 클래스는 상속 불가능한 문제점이 있다.
+*/
