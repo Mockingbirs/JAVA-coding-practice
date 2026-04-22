@@ -1,0 +1,95 @@
+/*
+Primitive Type
+1. null 값을 허용하지 않는다.
+2. 정해진 메모리를 할당한다.
+3. 스택(stack)영역에 저장된다.
+
+기본 자료형의 종류로는
+정수형 / 문자형 / 실수형 / 논리형 이 있다
+기본 자료형들은 각각, 그것들을 참조자료형을 사용하기 위한 Wrapper class 가 존재한다.
+
+
+          정수형     실수형     문자형     논리형
+1byte     byte                          boolean
+2byte     shot                 char
+4byte     int       float
+8byte     long      double
+
+
+Reference Type
+기본자료형이 아닌 모든 자료형이 참조자료형이다.
+참조자료형은 인스턴스 자료형을 가리킬 수 있는 자료형이고, 최상위 클래스인 Object를 상속받고 있다.
+
+래퍼 클래스는 기본자료형을 참조자료형처럼 사용할 수 있게 감싸주는 클래스들이다. 모든 기본자료형에 대한 래퍼클래스가 있다.
+래퍼 클래스는 String처럼 불변성을 가지고 있다.
+(래퍼 클래스 안에 있는 값을 변경할 수 없다. => 상식적으로도 전세계 모든 이들이 약속하고 공통으로 사용되는 문자를 사용하는 방식이라던가, 숫자를 사용하는 방식이 개인적으로 커스텀이 가능하다면 그것은 정말 이상할 것이다.)
+
+Primitive Type         Wrapper class
+byte                   Byte
+short                  Short
+int                    Integer
+long                   Long
+double                 Double
+char                   Character
+float                  Float
+boolean                Boolean
+
+
+기본자료형과 참조자료형의 차이
+참조자료형은 Object class 를 상속받는 "객체"이다.
+기본자료형은 메모리값이 정해져 있고 참조자료형은 사용하는 것에 따라 할당해야하는 메모리의 크기가 달라진다.
+기본자료형은 null을 허용하지 않지만, 참조자료형의 기본 값은 null로, null을 허용한다.
+수로 되어 있는 기본자료형(정수형 또는 실수형)같은 경우, 산술연산이(+-/* .. ) 가능하지만, 참조자료형은(=> 정수형 또는 실수형의 래퍼클래스 ) 불가능하다.
+기본자료형은 보통 클래스의 변수로 선언되어 인스턴스 안에 포함되거나 , 모두 스택영역에 저장되지만 참조자료형은 객체이므로 힙(Heap)메모리에 저장된다.
+
+
+래퍼 클래스가 필요한 순간
+객체 타입으로 저장해야할 때.
+매개변수로 객체를 받아야할 때,
+객체를 비교해야할 때.
+null 값을 허용해주어야할 때.
+제너릭에 사용하고 싶을 때. (=> 제너릭<> 에는 객체(class)을 담을 수 있기때문에 객체가 아닌 기본자료형은 사용할 수 없다.)
+정수 <-> 문자 .. 등 변환이 필요할 때.
+
+
+박싱과 언박싱 Boxing , Unboxing
+말 그대로 기본자료형을 래퍼 클래스로 감싸줄때에는 boxing이라고 표현하고 , 반대의 경우 unboxing 이라고 표현한다.
+주로 위에서 언급한 상황들에서 기본자료형들을 boxing 하여 래퍼클래스를 만들어준다.
+
+int primitiveInt = 10;
+Integer wrapperInt1 = new Integer(10); //int -> Integer boxing 방법 1. 
+Integer wrapperInt2 = Integer.valueOf(10); //int -> Integer boxing 방법 2.
+primitiveInt = wrapperInt1.IntValue;  // Integer -> int unboxing. 
+primitiveInt = wrapperInt1; //JDK 1.5 이후부터 자바에서 자동으로 언박싱을 해준다.
+
+
+자동 박싱(AutoBoxing)과 자동 언박싱(AutoUnBoxing)
+기본타입 값을 직접 박싱, 언박싱하지 않아도 자동적으로 박싱과 언박싱이 일어나는 경우가 있습니다. 자동 박싱의 포장 클래스 타입에 기본값이 대입될 경우에 발생합니다. 예를 들어 int타입의 값을 Integer클래스 변수에 대입하면 자동 박싱이 일어나 힙 영역에 Integer객체가 생성됩니다.
+public class Wrapper_Ex {
+    public static void main(String[] args)  {
+        Integer num = 17; // 자동 박싱
+        int n = num; //자동 언박싱
+        System.out.println(n);
+    }
+}
+
+위에서 언급했듯 자바에서 모든 객체는 힙(Heap)영역에 저장 되고 기본 자료형은 스택(STACK)영역에 저장된다.
+
+저장되는 영역이 다른데, 일반적으로 힙에서 데이터를 불러올 때보다 스택에서 불러오는 것이 속도가 빠르기 때문에 꼭 객체여야 할 필요가 없으면 기본자료형을 사용해서 속도를 향상시키는 방향이 더 좋을 것 같다.
+
+
+문자열 => 기본자료형
+byte b = Byte.parseByte("10")
+short s = Short.parseShrot("10")
+.....
+parse기본자료형의 형태
+
+문자열 => Wrapper 클래스 객체
+byte b = Byte.valueOf("10")
+short s = Short.valueOf("10")
+.....
+valueOf의 형태
+
+
+
+*/
