@@ -1,0 +1,152 @@
+/*
+예외 처리(exception handling) 이란, 프로그램 실행 시 발생할 수 있는 예기치 못한 예외의 발생에 대비한 코드를 작성하는것이다.
+자바의 코드를 예외 처리를 한다고 해서 프로그램의 예외 상황 자체를 막을 수는 없다.
+예외 처리의 목적은 예외의 발생으로 인한 실행 중인 프로그램의 갑작스런 비정상적인 동작을 막고, 에러를 잡아 복구를 시도하거나 아니면 회피 하는식으로 처리를해서, 프로그램이 정상적인 실행상태를 유지할 수 있도록 하는 것이다.
+
+try - catch 문
+다음은 예외처리를 위한 try, catch문의 기본 구조이다.
+try 블록에는 예외발생 가능 코드가 위치하고 만일 코드에 오류가 발생되면, 오류 종류(예외 클래스)에 맞는 catch 문으로 가서 catch 블록 안에 있는 코드를 실행 시킨다. 만일 오류가 발생하지 않으면 catch 문은 실행하지 않는다.
+
+catch 문을 보면 예외클래스 타입과 변수 e 가 선언되어 있는데, 만일 try문에서 예외가 발생하면 그 예외에 맞는 예외클래스가 catch문에 아규먼트로 선언되어 있으면 실행되어 옳지 못한 동작에 대해서 대비를 할 수 있다.
+
+
+아래와 같이 숫자를 0으로 나누는 산술적인 오류가 나면 -1로 초기화 하여 다음의 동작에 대해 대비할 수 가 있는 것이다.
+public class Exception {
+    public static void main(String[] args) {
+        int a, b, c;
+        try {
+            a = 10;
+            b = 0;
+            c = a / b; // 10 나누기 0 → 산술오류 ArithmeticException
+        } catch (ArithmeticException e) {
+            c = -1;  // 예외가 발생하여 이 문장이 수행된다.
+        }
+    }
+}
+그러나 꼭 오류가 산술 오류만 발생한다는 보장이 없다. 코딩하면서 언제 어디에서 오류가 발생할지 모르니 무수히 많은 오류를 예외 처리하기 위해서 하나하나 대비하려고 catch 문을 연달아 써야 하는 상황이 올 수 있다. 
+public class Exception {
+    public static void main(String[] args) {
+        int a, b, c;
+        try {
+        	// ... 길다란 코드
+            // ... 길다란 코드
+            // ... 길다란 코드
+            
+        } catch (NumberFormatException e) {
+            System.out.println("숫자로 변환할 수 없습니다.");
+        } catch (ClassNotFoundException e) {
+            System.out.println("클래스가 존재하지 않습니다.");         
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("실행 매개값의 수가 부족합니다.");
+        } catch (IOException e) {
+            System.out.println("입력값이 잘못 되었습니다.");
+        } catch (NullPointException e) {
+            System.out.println("NULL을 참조하고 있습니다.");
+        } ...
+    }
+}
+예외 클래스 갯수만 해도 수백개인데 이것을 일일히 코드에 다 작성하는 것은 무리이다.
+따라서 클래스의 상속 관계(다형성)를 이용하여 예외클래스의 상위 클래스인 Exception 클래스 타입을 catch문 아규먼트에 선언하면, 코드 몇줄만으로 자바의 나머지 모든 예외 클래스를 catch 문으로 받아들일 수 있게 된다.
+다만, 세세하게 어떠어떠한 예외인지는 부모 클래스인 Exception 클래스만으로는 알수 없게 된다는 단점이 있다.
+public class Exception {
+    public static void main(String[] args) {
+        int a, b, c;
+        try {
+        	// ... 길다란 코드
+            // ... 길다란 코드
+            // ... 길다란 코드
+            
+        } catch (NumberFormatException e) {
+            System.out.println("숫자로 변환할 수 없습니다.");
+        } catch (ClassNotFoundException e) {
+            System.out.println("클래스가 존재하지 않습니다.");         
+        } catch (Exception e) { // 부모 예외 클래스로 한꺼번에 처리했기 때문에 세세한 예외 클래스 종류는 지금은 알 수는 없다.
+            System.out.println("NumberFormatException와 ClassNotFoundException 이외에 모르는 어떠한 에러가 발생하였습니다");
+        }
+    }
+}
+
+try - catch - finally 문
+위에서 살펴봤듯이 프로그램 수행 도중 예외가 발생하면 프로그램이 중지되거나 예외 처리에 의해 catch 구문이 실행된다. 
+하지만 어떤 예외가 발생하더라도 반드시 실행되어야 하는 부분이 있어야 한다면 finally 문으로 처리가 가능하다.
+Sample sample = new Sample();
+
+try {
+    sample.addSample(100);
+    sample.printSample(); // 만일 이 메서드를 실행하는데 에러가 나버리면 !
+    
+} catch (Exception e) {
+	// ... catch 문의 코드가 실행되고
+} finally {
+	 sample.shouldBeRun(); // 에러가 나든 안나든 무조건 finally 문은 실행된다.
+}
+예외가 발생한 경우에는 try  →  catch  →  finally 의 순서로 실행되고, 예외가 발생하지 않는 경우에는 try  →  finally 의 순으로 실행된다고 보면 된다
+
+멀티 catch 문
+JDK 1.7부터 여러 catch 블럭을  | 기호를 통해서 하나의 catch 블럭으로 합칠 수 있게 되었다.
+위와 같이 catch문이 연달아 나열되는 중복된 코드를 줄일 수 있으며 연결할 수 있는 예외 클래스의 개수에도 제한이 없다.
+try {
+    // ...
+} catch (NullPointException | ArrayIndexOutOfBoundsExcetion e) {
+    // ...
+}
+다만 멀티 catch는 결국은 위의 부모 예외 클래스 Exceptoin과 같이 여러 개의 예외를 통짜로 처리하는 것이기 때문에 각 예외마다 세세하게 제어하고 싶다면 if문과 instanceOf 연산자로 하나하나 분기하며 처리해야 한다.
+try {
+    // ...
+} catch (NullPointException | ArrayIndexOutOfBoundsExcetion e) {
+    if(e instanceOf NullPointException) {
+    	// ...
+    } else if(e instanceOf ArrayIndexOutOfBoundsExcetion) {
+    	// ...
+    }
+}
+
+catch 문의 Exception e 에서 Exception은 변수의 클래스 타입이 되고, e는 변수이다. (메소드의 매개변수 같이 생각해주면 된다)
+그리고 이 객체 변수안에는 에러 메세지를 출력하는 메서드가 들어 있다.
+
+printStackTrace() : 예외발생 당시의 호출스택(Call Stack)에 있었던 메서드의 정보와 예외 메시지를 화면에 출력 
+getMessage() : 발생한 예외클래스의 인스턴스에 저장된 메시지를 얻을 수 있다.
+단, printStackTrace() 는 프로그램의 내부 요소를 자세하게 추적하여 오류 메세지를 내보이기에 이를 외부에 노출시키면 보안적인 문제가 될 수 있으니 관계자만 확인 할 수 있도록 만들어 주는 것이 좋다.
+try{
+    ...
+    System.out.println(0/0); // ArithmeticException 예외 발생
+    ...
+} catch(ArithmeticException e){ // e는 해당하는 에러의 예외정보가 담겨 있는 참조 변수 이다
+
+	// 에러 메세지
+    System.out.println(aa.getMessage()); // by zero
+
+	// 상세한 에러 추적 메세지
+	e.printStackTrace(); // java.lang.ArithmeticException: / by zero at MyClass.main(MyClass.java:5)
+}
+
+커스텀 예외 만들어 보기
+자바의 예외 클래스의 구성에 대해 완벽히 이해했다면 직접 사용자 커스텀 예외 클래스를 만들어 사용할 수 도 있다.
+자바의 예외 처리는 결국 클래스이다. 즉, null 관련 에러가 나면 그냥 NullPointerException 클래스가 초기화 되어 그 객체를 catch 문 안에서 사용하는 것 뿐이다.
+// 사용자 커스텀 예외 클래스를 만들려면 부모 클래스인 Exception 클래스를 상속 하면 된다.
+class MyErrException extends Exception {
+    private String msg;
+	
+    // 사용자 커스텀 예외클래스 생성자
+    public MyErrException(String msg) {
+        super(msg); // 부모 Exception 클래스 생성자도 호출
+        this.msg = msg;
+    }
+	
+    // 사용자 커스텀 예외클래스 메세지 출력
+    public void printMyMessage() {
+        System.out.println(this.msg);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        try {
+            throw new MyErrException("나의 커스텀 예외 클래스 메세지"); // 커스텀 예외 클래스 발생
+        } catch (MyErrException e) {
+            e.printMyMessage(); // 커스텀 예외 클래스의 메서드 실행
+            e.printStackTrace(); // 상속한 부모클래스의 메서드 실행
+        }
+    }
+}
+*/
